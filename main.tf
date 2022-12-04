@@ -110,6 +110,14 @@ resource "aws_iam_role_policy" "codebuild_policy" {
         "${aws_s3_bucket.codebuild_output.arn}",
         "${aws_s3_bucket.codebuild_output.arn}/*"
       ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ecr-public:GetAuthorizationToken",
+        "ecr:GetAuthorizationToken"
+      ],
+      "Resource": "*"
     }
   ]
 }
@@ -136,6 +144,7 @@ resource "aws_codebuild_project" "test_project" {
     image                       = "aws/codebuild/standard:1.0"
     type                        = "LINUX_CONTAINER"
     image_pull_credentials_type = "CODEBUILD"
+    privileged_mode             = true
   }
 
   logs_config {
