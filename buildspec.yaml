@@ -2,7 +2,7 @@ version: 0.2
 
 env:
   variables:
-    IMAGE_REPO_NAME: sagemaker-docker-cpu
+    IMAGE_REPO_NAME: test-sagemaker-repository
     IMAGE_NAME: public.ecr.aws/k1d3r4z1/deepracer-sim-public
     IMAGE_TAG: latest
 
