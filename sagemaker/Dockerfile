@@ -3,7 +3,7 @@
 # in the Alpha AWS account, as that is where BATS builds are configured to take place.
 #
 # See the following for more information on BATS DockerImage: https://w.amazon.com/index.php/BuilderTools/PackagingTeam/Products/BATS/Transformers/DockerImage
-FROM ubuntu:18.04
+FROM public.ecr.aws/lts/ubuntu:18.04
 
 COPY ./src/markov /opt/amazon/markov
 
