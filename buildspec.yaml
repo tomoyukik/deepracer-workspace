@@ -1,0 +1,33 @@
+version: 0.2
+
+env:
+  variables:
+    IMAGE_NAME: public.ecr.aws/k1d3r4z1/deepracer-sim-public
+    REPO_NAME: sagemaker-docker-cpu
+
+phases:
+  install:
+    on-failure: ABORT
+    commands:
+      - sudo -y apt-get install jq
+  pre_build:
+    on-failure: ABORT
+    commands:
+      - AWS_ACCOUNT_ID=$(echo ${CODEBUILD_BUILD_ARN} | sed -E s/^.\*\(\[0-9\]\{12\}\).\*\$/\\1/)
+      - echo ${AWS_ACCOUNT_ID}
+      - aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
+      - docker pull "${IMAGE_NAME}"
+      - IMAGE_ID=$(docker images --format '{{ json . }}' | grep ${IMAGE_NAME} | jq -r '.ID')
+      - CONTAINER_ID=$(docker run -d -t "${IMAGE_ID}")
+      - mkdir -p ./sagemaker/src/lib
+      - docker cp "${CONTAINER_ID}:/opt/amazon/markov" ./sagemaker/src/
+      - docker cp "${CONTAINER_ID}:/opt/amazon/rl_coach.patch" ./sagemaker/src/
+      - docker cp "${CONTAINER_ID}:/opt/ml/code/." ./sagemaker/src/lib/
+  build:
+    on-failure: ABORT
+    commands:
+      - docker build -t "${REPO_NAME}" -f ./sagemaker/Dockerfile ./sagemaker
+  post_build:
+    on-failure: ABORT
+    commands:
+      - docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${REPO_NAME}
