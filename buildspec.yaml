@@ -14,8 +14,8 @@ phases:
     on-failure: ABORT
     commands:
       - AWS_ACCOUNT_ID=$(echo ${CODEBUILD_BUILD_ARN} | sed -E s/^.\*\(\[0-9\]\{12\}\).\*\$/\\1/)
-      - echo ${AWS_ACCOUNT_ID}
-      - aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
+      - echo "${AWS_ACCOUNT_ID}:${AWS_DEFAULT_REGION}/${AWS_REGION}|${AWS_DEFAULT_REGION}"
+      - aws ecr get-login-password --region "${AWS_DEFAULT_REGION}" | docker login --username AWS --password-stdin "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
       - docker pull "${IMAGE_NAME}"
       - IMAGE_ID=$(docker images --format '{{ json . }}' | grep ${IMAGE_NAME} | jq -r '.ID')
       - CONTAINER_ID=$(docker run -d -t "${IMAGE_ID}")
