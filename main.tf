@@ -162,19 +162,6 @@ resource "aws_codebuild_project" "test_project" {
 
   source_version = "main"
 
-  vpc_config {
-    vpc_id = aws_default_vpc.default.id
-
-    subnets = [
-      aws_default_subnet.default_az1.id,
-      aws_default_subnet.default_az2.id,
-    ]
-
-    security_group_ids = [
-      aws_default_security_group.default.id
-    ]
-  }
-
   tags = {
     Environment = "Test"
   }
