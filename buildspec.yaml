@@ -2,8 +2,9 @@ version: 0.2
 
 env:
   variables:
+    IMAGE_REPO_NAME: sagemaker-docker-cpu
     IMAGE_NAME: public.ecr.aws/k1d3r4z1/deepracer-sim-public
-    REPO_NAME: sagemaker-docker-cpu
+    IMAGE_TAG: latest
 
 phases:
   install:
@@ -26,8 +27,9 @@ phases:
   build:
     on-failure: ABORT
     commands:
-      - docker build -t "${REPO_NAME}" -f ./sagemaker/Dockerfile ./sagemaker
+      - docker build -t "${IMAGE_REPO_NAME}" -f ./sagemaker/Dockerfile ./sagemaker
+      - docker tag $IMAGE_REPO_NAME:${IMAGE_TAG} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:$IMAGE_TAG
   post_build:
     on-failure: ABORT
     commands:
-      - docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${REPO_NAME}
+      - docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}
