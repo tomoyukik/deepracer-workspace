@@ -12,6 +12,9 @@ provider "aws" {
   region = "us-east-1"
 }
 
+data "aws_caller_identity" "self" {}
+data "aws_region" "current" {}
+
 resource "aws_ecr_repository" "sagemaker" {
   name                 = "test-sagemaker-repository"
   image_tag_mutability = "MUTABLE"
@@ -86,7 +89,7 @@ resource "aws_iam_role_policy" "codebuild_policy" {
         "ec2:CreateNetworkInterfacePermission"
       ],
       "Resource": [
-        "arn:aws:ec2:us-east-1:123456789012:network-interface/*"
+        "arn:aws:ec2:${data.aws_region.current.name}:${data.aws_caller_identity.self.account_id}:network-interface/*"
       ],
       "Condition": {
         "StringEquals": {
